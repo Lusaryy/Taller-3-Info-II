@@ -3,13 +3,12 @@ import pydicom
 import pandas as pd
 import numpy as np
 
-
 class ProcesadorDICOM:
     def __init__(self, carpeta):
         self.carpeta = carpeta
-        self.archivos = []          
-        self.dicom_objs = []        
-        self.dataframe = None      
+        self.archivos = []
+        self.dicom_objs = []
+        self.dataframe = None
 
 
     def cargar_archivos(self):
@@ -63,7 +62,7 @@ class ProcesadorDICOM:
             raise ValueError("~ Error. Inténtalo de nuevo ~")
 
         intensidades = []
-        
+
         for obj in self.dicom_objs:
             try:
                 arr = obj.pixel_array.astype(np.float32)
@@ -76,9 +75,27 @@ class ProcesadorDICOM:
         self.dataframe["IntensidadPromedio"] = intensidades
         return self.dataframe
 
+if __name__=="main":
 
-procesador = ProcesadorDICOM(" ")
-procesador.cargar_archivos()
-procesador.crear_dataframe()
-procesador.calcular_intensidad_promedio()
-print(procesador.dataframe)
+    RUTA_DICOM = input("Ingresa la ruta de la carpeta con archivos DICOM o enter para usar predeterminada: ").strip ()
+
+    if not RUTA_DICOM:
+        RUTA_DICOM ="./data"
+        print(f"No se Ingreso ruta. usando ruta por defecto {RUTA_DICOM}\n")
+
+    try:
+        procesador = ProcesadorDICOM(RUTA_DICOM)
+
+
+        procesador.cargar_archivos()
+        procesador.crear_dataframe()
+        procesador.calcular_intensidad_promedio()
+        print("Resultados del procesamiento")
+        print(procesador.dataframe)
+
+    except FileNotFoundError as e:
+        print(f"Error:{e}")
+        print("Por favor, verifica la ruta de la carpeta DICOM")
+
+    except Exception as e:
+        print(f"Error inesperado:{e}")
